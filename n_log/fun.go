@@ -50,7 +50,12 @@ func PanicWithLayer(layer int, str string, v ...interface{}) {
 	panic(stmp)
 }
 
-func Erro(str string, v ...interface{}) error {
+func Erro(str string, v ...interface{}) {
+	str = getStr(str, v...)
+	appendLog("Erro", str, 2)
+}
+
+func ErroWithBack(str string, v ...interface{}) error {
 	str = getStr(str, v...)
 	appendLog("Erro", str, 2)
 	return errors.New(str)

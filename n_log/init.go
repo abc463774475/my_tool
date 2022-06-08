@@ -99,14 +99,11 @@ func InitLog(options ...Option) {
 		// 暂时不推荐 异步模式，会牵涉日志 shutdown的问题
 		go func() {
 			for {
-				select {
-				case d, ok := <-ptemp.c:
-					if !ok {
-						return
-					}
-
-					flushLog(d.sBack, d.lName)
+				d, ok := <-ptemp.c
+				if !ok {
+					return
 				}
+				flushLog(d.sBack, d.lName)
 			}
 		}()
 	}
