@@ -1,14 +1,15 @@
-package n_log
+package nlog
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"runtime"
 	"runtime/debug"
+	"strings"
 	"time"
-	"encoding/json"
 )
 
 func getStr(s string, v ...interface{}) string {
@@ -21,152 +22,128 @@ func Info(str string, v ...interface{}) {
 	appendLog("Info", getStr(str, v...), 2)
 }
 
-func Info_cengci(cengci int,str string, v ...interface{}) {
-	appendLog("Info", getStr(str, v...), cengci)
+// layer 本身底层有2层 ， 比如 1 +2 = 3 调用函数的上层打印地址
+func InfoWithLayer(layer int, str string, v ...interface{}) {
+	layer += 2
+	appendLog("Info", getStr(str, v...), layer)
 }
 
 func Debug(str string, v ...interface{}) {
 	appendLog("Debug", getStr(str, v...), 2)
 }
 
-func Debug_cengci(cengci int,str string, v ...interface{}) {
-	appendLog("Debug", getStr(str, v...), cengci)
+func DebugWithLayer(layer int, str string, v ...interface{}) {
+	layer += 2
+	appendLog("Debug", getStr(str, v...), layer)
 }
 
-func Erro(str string, v ...interface{}) {
-	appendLog("Erro", getStr(str, v...), 2)
-}
-
-func Erro_cengci(cengci int,str string, v ...interface{}) {
-	appendLog("Erro", getStr(str, v...), cengci)
-}
-
-func Panic (str string,v ...interface{}){
+func Panic(str string, v ...interface{}) {
 	stmp := getStr(str, v...)
-	appendLog("Erro",stmp , 2)
+	appendLog("Erro", stmp, 2)
 	panic(stmp)
 }
 
-func Panic_cengci (cengci int,str string,v ...interface{}){
+func PanicWithLayer(layer int, str string, v ...interface{}) {
+	layer += 2
 	stmp := getStr(str, v...)
-	appendLog("Erro",stmp , cengci)
+	appendLog("Erro", stmp, layer)
 	panic(stmp)
 }
 
-
-func ErroBack(str string, v ...interface{}) error {
+func Erro(str string, v ...interface{}) error {
 	str = getStr(str, v...)
 	appendLog("Erro", str, 2)
 	return errors.New(str)
 }
 
-func ErroBack_cengci(cengci int,str string, v ...interface{}) error {
+func ErroWithLayer(layer int, str string, v ...interface{}) error {
+	layer += 2
 	str = getStr(str, v...)
-	appendLog("Erro", str, cengci)
+	appendLog("Erro", str, layer)
 	return errors.New(str)
 }
-
 
 func OnlyFile(str string, v ...interface{}) {
 	appendLog("OnlyFile", getStr(str, v...), 2)
 }
 
-func OnlyFile_cengci(cengci int,str string, v ...interface{}) {
-	appendLog("OnlyFile", getStr(str, v...), cengci)
+func OnlyFileWithLayer(layer int, str string, v ...interface{}) {
+	layer += 2
+	appendLog("OnlyFile", getStr(str, v...), layer)
 }
 
-
-func PrintJsonDebug (str string, v ...interface{}){
+func JsonDebug(str string, v ...interface{}) {
 	d, err := json.Marshal(v)
 	if err != nil {
-		Erro_special(3,"json marsharl not right  %v  %v",err,v)
+		ErroWithStack(3, "json marsharl not right  %v  %v", err, v)
 		return
 	}
 
 	appendLog("Debug", getStr(str, string(d)), 2)
 }
 
-func PrintJsonDebug_cengci (cengci int,str string, v ...interface{}){
+func JsonDebugWithLayer(layer int, str string, v ...interface{}) {
+	layer += 2
 	d, err := json.Marshal(v)
 	if err != nil {
-		Erro_special(cengci+1,"json marsharl not right  %v  %v",err,v)
+		ErroWithStack(layer+1, "json marsharl not right  %v  %v", err, v)
 		return
 	}
 
-	appendLog("Debug", getStr(str, string(d)), cengci)
+	appendLog("Debug", getStr(str, string(d)), layer)
 }
 
-func PrintJsonInfo (str string, v ...interface{}){
+func JsonInfo(str string, v ...interface{}) {
 	d, err := json.Marshal(v)
 	if err != nil {
-		Erro_special(3,"json marsharl not right  %v  %v",err,v)
+		ErroWithStack(3, "json marsharl not right  %v  %v", err, v)
 		return
 	}
 
 	appendLog("Info", getStr(str, string(d)), 2)
 }
 
-func PrintJsonInfo_cengci (cengci int,str string, v ...interface{}){
+func JsonInfoWithLayer(layer int, str string, v ...interface{}) {
+	layer += 2
 	d, err := json.Marshal(v)
 	if err != nil {
-		Erro_special(cengci+1,"json marsharl not right  %v  %v",err,v)
+		ErroWithStack(layer+1, "json marsharl not right  %v  %v", err, v)
 		return
 	}
 
-	appendLog("Info", getStr(str, string(d)), cengci)
+	appendLog("Info", getStr(str, string(d)), layer)
 }
 
-func PrintJsonErro (str string, v ...interface{}){
+func JsonErro(str string, v ...interface{}) {
 	d, err := json.Marshal(v)
 	if err != nil {
-		Erro_special(2,"json marsharl not right  %v  %v",err,v)
+		ErroWithStack(2, "json marsharl not right  %v  %v", err, v)
 		return
 	}
 
 	appendLog("Erro", getStr(str, string(d)), 2)
 }
 
-func PrintJsonErro_cengci (cengci int,str string, v ...interface{}){
+func JsonErroWithLayer(layer int, str string, v ...interface{}) {
+	layer += 2
 	d, err := json.Marshal(v)
 	if err != nil {
-		Erro_special(cengci + 1,"json marsharl not right  %v  %v",err,v)
+		ErroWithStack(layer+1, "json marsharl not right  %v  %v", err, v)
 		return
 	}
 
-	appendLog("Erro", getStr(str, string(d)), cengci)
+	appendLog("Erro", getStr(str, string(d)), layer)
 }
 
-func Erro_special(cengci int,str string, v ...interface{}) {
+func ErroWithStack(layer int, str string, v ...interface{}) {
+	layer += 2
 	str = getStr(str, v...)
 	str = fmt.Sprintf("%v\nstack print  %v", str, string(debug.Stack()))
 
-	appendLog("Erro", str, cengci)
+	appendLog("Erro", str, layer)
 }
 
-
-//func Info_cengci(cengci int,str string, v ...interface{})  {
-//	str = getStr(str,v...)
-//	appendLog("Info",str,cengci)
-//}
-
-func appendLog(lName, s string, cengci int) {
-	g_log.lock.Lock()
-	defer g_log.lock.Unlock()
-
-	if g_log.file == nil {
-		ltmp := time.Unix(time.Now().Unix(), 0).Format("2006-01-02_15_04_05")
-		ltmp = fmt.Sprintf("./%s/%s%v.log", g_log.curDir, ltmp, time.Now().Nanosecond())
-
-		lf, err := os.Create(ltmp)
-		if err != nil {
-			str := fmt.Sprintf("logFile Init Erro %v %v ", ltmp, err)
-			log.Println(str)
-			return
-			//panic(str)
-		}
-		g_log.file = lf
-	}
-
+func appendLog(lName, s string, layer int) {
 	var fileName string
 	var lines int
 	var bret bool
@@ -174,7 +151,7 @@ func appendLog(lName, s string, cengci int) {
 
 	curTimeStr := time.Unix(time.Now().Unix(), 0).Format("2006-01-02 15:04:05")
 
-	f1, fileName, lines, bret = runtime.Caller(cengci)
+	f1, fileName, lines, bret = runtime.Caller(layer)
 
 	if !bret {
 		fileName = "???"
@@ -183,20 +160,57 @@ func appendLog(lName, s string, cengci int) {
 
 	var sBack string
 
-	if len(g_log.param) == 0 {
-		sBack = fmt.Sprintf("%s:%d : [%s]: %s func[%s]: %s",
-			fileName, lines,
-			lName, curTimeStr, runtime.FuncForPC(f1).Name(), s)
-	} else {
-		sBack = fmt.Sprintf("%s:%d : [%s]: %s func[%s]: %s last log timeOut \n%v\n",
-			fileName, lines,
-			lName, curTimeStr, runtime.FuncForPC(f1).Name(), s, g_log.param)
+	funName := runtime.FuncForPC(f1).Name()
 
-		g_log.param = ""
+	compressType := _log.comressType
+
+	if compressType == Quick {
+		strs := strings.Split(fileName, "/")
+		if len(strs) != 0 {
+			fileName = strs[len(strs)-1]
+		}
 	}
 
-	if isWriteLog || lName == "Erro"{
-		g_log.file.Write([]byte(sBack))
+	if compressType != Full {
+		strs := strings.Split(funName, "/")
+		if len(strs) != 0 {
+			funName = strs[len(strs)-1]
+		}
+	}
+
+	sBack = fmt.Sprintf("%s:%d : [%s]: %s func[%s]: %s",
+		fileName, lines,
+		lName, curTimeStr, funName, s)
+
+	if !_log.isAsyn {
+		flushLog(sBack, lName)
+	} else {
+		_log.c <- &flushData{
+			sBack: sBack,
+			lName: lName,
+		}
+	}
+}
+
+func flushLog(sBack string, lName string) {
+	_lock.Lock()
+	defer _lock.Unlock()
+
+	if _log.file == nil {
+		ltmp := time.Unix(time.Now().Unix(), 0).Format("2006-01-02_15_04_05")
+		ltmp = fmt.Sprintf("./%s/%s%v.log", _log.curDir, ltmp, time.Now().Nanosecond())
+
+		lf, err := os.Create(ltmp)
+		if err != nil {
+			str := fmt.Sprintf("logFile Init Erro %v %v ", ltmp, err)
+			log.Println(str)
+			return
+		}
+		_log.file = lf
+	}
+
+	if _log.isWriteLog || lName == "Erro" {
+		_, _ = _log.file.Write([]byte(sBack))
 	}
 
 	// console color
@@ -212,11 +226,11 @@ func appendLog(lName, s string, cengci int) {
 		fmt.Print(sBack)
 	}
 
-	g_log.curTotalLines++
+	_log.curTotalLines++
 
-	if g_log.curTotalLines >= oneFileMaxLines {
-		g_log.file.Close()
-		g_log.curTotalLines = 0
-		g_log.file = nil
+	if _log.oneFileMaxLines != -1 && _log.curTotalLines >= _log.oneFileMaxLines {
+		_log.file.Close()
+		_log.curTotalLines = 0
+		_log.file = nil
 	}
 }
